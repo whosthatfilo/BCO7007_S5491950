@@ -1,0 +1,103 @@
+---
+title: "Asessment 1"
+author: "Kris Chavez (s4591950)"
+date: '2022-05-06'
+output: 
+  html_document:
+      number_sections: true           
+      toc: true                                                                  #TOC = Table of COntents
+      toc_depth: 2
+      theme: readable                                                            #Added a theme to make the document more appealing
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Install.packages("tidyverse")
+# Install.packages("rtweet")
+library(tidyverse)
+library(rtweet)
+```
+
+
+### Loading the raw dataset
+As shown below, we have loaded the *data* in a **new** variable called 'Climate'.  
+
+Our main intention is to collection tweets about Climate.
+```{r}
+climate_tweets <- search_tweets(q = "#Climate", 
+                        n = 1000,
+                        include_rts = FALSE,
+                        `-filter` = "replies",
+                        lang = "en")
+```
+
+## Looking at the sample dataset
+* We used n=100 to retrieved the number of tweets
+* This leaves us with an:
+** Observation: 17,852
+** Variables: 6
+```{r}
+climate_tweets %>% 
+  sample_n(100) %>%
+  select(created_at, screen_name, text, favorite_count, retweet_count)
+```
+
+## Download a copy to your pc's directory
+```{r}
+
+write_as_csv(climate_tweets, "climate_tweets.csv")
+
+```
+
+## Reviewing your dataset and visualise the frequency of your tweets
+* We are using the GGPLOT package to display the data set as a plot
+```{r}
+
+# PLOT THE Data set
+ts_plot(climate_tweets, "hours") +
+  labs(x = NULL, y = NULL,
+       title = "Frequency of tweets with a #Climate hashtag",
+       subtitle = paste0(format(min(climate_tweets$created_at), "%d %B %Y"), " to ", format(max(climate_tweets$created_at),"%d %B %Y")),
+       caption = "Data collected from Twitter's REST API via rtweet") +
+  theme_minimal()
+
+```
+
+## Identify top tweeting locations and present the first 10
+```{r}
+
+##  Identify the locations
+climate_tweets %>% 
+  filter(!is.na(place_full_name)) %>% 
+  count(place_full_name, sort = TRUE) %>% 
+  top_n(10)
+
+```
+
+## Identify the most retweeting tweets (top 20)
+```{r}
+
+climate_tweets %>% 
+  arrange(-retweet_count) %>%
+  slice(1:20) %>% 
+  select(created_at, screen_name, text, favorite_count, retweet_count)
+
+```
+
+## Removing the duplicates from the raw dataset
+* The script below is used to delete the duplicate rows.  However, for this specific assignment I did not set the .keep_all = TRUE to false.
+* I wanted to present the data set in it's most natural form (which is messy but organised).
+* If you want to delete the duplicates - change the script below to: __.keep_all = FALSE__ 
+```{r script to delete the duplicates}
+
+# create the data frame
+climate_tweets %>% distinct()
+
+# Remove duplicated rows based on Sepal.Length
+climate_tweets %>% distinct(user_id, .keep_all = TRUE)                           # the option .keep_all = TRUE keeps the data.  SET this to FALSE if you want to remove the duplicates
+
+# Remove duplicated rows based on:
+# user_id and screen_name
+climate_tweets %>% distinct(user_id, screen_name, .keep_all = TRUE)              # the option .keep_all = TRUE keeps the data.  SET this to FALSE if you want to remove the duplicates
+
+```
