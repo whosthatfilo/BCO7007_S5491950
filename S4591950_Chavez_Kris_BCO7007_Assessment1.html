@@ -393,8 +393,8 @@ visualise the frequency of your tweets</a></li>
 and present the first 10</a></li>
 <li><a href="#identify-the-most-retweeting-tweets-top-20"><span class="toc-section-number">0.5</span> Identify the most retweeting
 tweets (top 20)</a></li>
-<li><a href="#removing-the-duplicates-from-the-raw-dataset"><span class="toc-section-number">0.6</span> Removing the duplicates from the
-raw dataset</a></li>
+<li><a href="#optional-removing-the-duplicates-from-the-raw-dataset"><span class="toc-section-number">0.6</span> [OPTIONAL] Removing the duplicates
+from the raw dataset</a></li>
 </ul>
 </div>
 
@@ -423,16 +423,16 @@ dataset</h2>
 <pre><code>## # A tibble: 100 × 5
 ##    created_at          screen_name     text         favorite_count retweet_count
 ##    &lt;dttm&gt;              &lt;chr&gt;           &lt;chr&gt;                 &lt;int&gt;         &lt;int&gt;
-##  1 2022-05-06 17:00:05 T4planetracker  &quot;▶▶€9,509,2…              0             0
-##  2 2022-05-07 05:17:16 iangoldmansa    &quot;Filipino i…              0             0
-##  3 2022-05-06 16:23:58 ClimateComms    &quot;@RARohde @…             28            18
-##  4 2022-05-06 14:14:27 geomatlab       &quot;#Climate J…              0             0
-##  5 2022-05-06 21:15:48 ClimateJobList  &quot;✨ New #Op…              0             0
-##  6 2022-05-06 09:00:05 ELDaily         &quot;#ICYMI: In…              0             1
-##  7 2022-05-06 16:30:31 DanPattersonUSA &quot;Drought re…              0             0
-##  8 2022-05-06 10:22:12 anttilip        &quot;April 2022…              2             2
-##  9 2022-05-06 18:05:17 katerauner      &quot;Irony Ride…              0             0
-## 10 2022-05-07 06:17:20 AnjaLeetz       &quot;Why we nee…              0             0
+##  1 2022-05-06 20:30:52 EarthDay        &quot;\&quot;Nepal&#39;s …             12             5
+##  2 2022-05-06 18:30:12 worldgrain      &quot;Louis Drey…              1             0
+##  3 2022-05-06 22:00:01 orfonline       &quot;Both #clim…              0             0
+##  4 2022-05-06 11:50:03 realmethod41    &quot;COP26: Sys…              0             0
+##  5 2022-05-07 01:20:47 LobbyForClimate &quot;This event…              0             0
+##  6 2022-05-06 16:52:26 BrianEttling    &quot;For #Clima…              2             1
+##  7 2022-05-06 23:02:50 JonathonStillw2 &quot;#Climate #…              1             1
+##  8 2022-05-06 19:08:05 ELDaily         &quot;@AmericanE…              0             0
+##  9 2022-05-07 00:21:24 tonybanzai      &quot;@FloridaGO…              0             1
+## 10 2022-05-06 23:54:55 GeorgeDearing   &quot;When someo…              0             0
 ## # … with 90 more rows</code></pre>
 </div>
 <div id="download-a-copy-to-your-pcs-directory" class="section level2" number="0.2">
@@ -492,14 +492,14 @@ retweeting tweets (top 20)</h2>
 <pre><code>## # A tibble: 20 × 5
 ##    created_at          screen_name     text         favorite_count retweet_count
 ##    &lt;dttm&gt;              &lt;chr&gt;           &lt;chr&gt;                 &lt;int&gt;         &lt;int&gt;
-##  1 2022-05-06 10:25:49 CarolineLucas   &quot;Last year,…           1095           411
-##  2 2022-05-06 23:32:12 MikeHudema      &quot;Another #r…            461           186
+##  1 2022-05-06 10:25:49 CarolineLucas   &quot;Last year,…           1097           411
+##  2 2022-05-06 23:32:12 MikeHudema      &quot;Another #r…            464           187
 ##  3 2022-05-06 12:34:12 MikeHudema      &quot;A landfill…            247           183
-##  4 2022-05-07 03:40:09 MikeHudema      &quot;Ocean Wave…            167            74
+##  4 2022-05-07 03:40:09 MikeHudema      &quot;Ocean Wave…            170            74
 ##  5 2022-05-06 20:36:48 RDNS_TAI        &quot;Of the nex…            163            63
 ##  6 2022-05-06 11:21:44 ECOWARRIORSS    &quot;its not ju…             83            52
 ##  7 2022-05-06 19:34:06 PCarterClimate  &quot;EXTINCTION…             47            46
-##  8 2022-05-06 12:29:12 AssaadRazzouk   &quot;Renewable …             80            43
+##  8 2022-05-06 12:29:12 AssaadRazzouk   &quot;Renewable …             81            43
 ##  9 2022-05-06 20:04:23 ElizabethMay    &quot;NEW #Clima…            142            38
 ## 10 2022-05-06 21:24:22 CGMeifangZhang  &quot;A powerful…             94            33
 ## 11 2022-05-06 19:48:02 OntarioGreens   &quot;Young Onta…             49            29
@@ -513,9 +513,9 @@ retweeting tweets (top 20)</h2>
 ## 19 2022-05-06 19:47:35 ECOWARRIORSS    &quot;It&#39;s Time …             41            16
 ## 20 2022-05-06 21:41:22 TheEnemyOfSatan &quot;@ReedTimme…              0            15</code></pre>
 </div>
-<div id="removing-the-duplicates-from-the-raw-dataset" class="section level2" number="0.6">
-<h2><span class="header-section-number">0.6</span> Removing the
-duplicates from the raw dataset</h2>
+<div id="optional-removing-the-duplicates-from-the-raw-dataset" class="section level2" number="0.6">
+<h2><span class="header-section-number">0.6</span> [OPTIONAL] Removing
+the duplicates from the raw dataset</h2>
 <ul>
 <li>The script below is used to delete the duplicate rows. However, for
 this specific assignment I did not set the .keep_all = TRUE to

@@ -23,7 +23,7 @@ library(rtweet)
 As shown below, we have loaded the *data* in a **new** variable called 'Climate'.  
 
 Our main intention is to collection tweets about Climate.
-```{r}
+```{r load the data set}
 climate_tweets <- search_tweets(q = "#Climate", 
                         n = 1000,
                         include_rts = FALSE,
@@ -36,14 +36,14 @@ climate_tweets <- search_tweets(q = "#Climate",
 * This leaves us with an:
 ** Observation: 17,852
 ** Variables: 6
-```{r}
+```{r loading the specified number of tweets}
 climate_tweets %>% 
   sample_n(100) %>%
   select(created_at, screen_name, text, favorite_count, retweet_count)
 ```
 
 ## Download a copy to your pc's directory
-```{r}
+```{r saving a csv copy to your pc}
 
 write_as_csv(climate_tweets, "climate_tweets.csv")
 
@@ -51,7 +51,7 @@ write_as_csv(climate_tweets, "climate_tweets.csv")
 
 ## Reviewing your dataset and visualise the frequency of your tweets
 * We are using the GGPLOT package to display the data set as a plot
-```{r}
+```{r visualise and presenting the data}
 
 # PLOT THE Data set
 ts_plot(climate_tweets, "hours") +
@@ -64,7 +64,7 @@ ts_plot(climate_tweets, "hours") +
 ```
 
 ## Identify top tweeting locations and present the first 10
-```{r}
+```{r Locations}
 
 ##  Identify the locations
 climate_tweets %>% 
@@ -75,7 +75,7 @@ climate_tweets %>%
 ```
 
 ## Identify the most retweeting tweets (top 20)
-```{r}
+```{r Filtering the most re-tweeted tweets}
 
 climate_tweets %>% 
   arrange(-retweet_count) %>%
