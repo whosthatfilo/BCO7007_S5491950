@@ -1,0 +1,152 @@
+---
+title: "Asessment 1-Part2"
+author: "Kris Chavez (s4591950)"
+date: '2022-05-14'
+output: 
+  html_document:
+      number_sections: true           
+      toc: true                                                                  #TOC = Table of COntents
+      toc_depth: 2
+      theme: readable                                                            #Added a theme to make the document more appealing
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# install.packages("tidyverse")
+# install.packages("tidytext")
+# install.packages("rtweet")
+# install.packages("emojifont")
+# install.packages("devtools")
+
+library(tidyverse)
+library(tidytext)
+library(rtweet)
+library(emojifont)
+library(devtools)
+```
+
+# Part 2
+
+## Data import
+
+Step 1. collect tweets about coffee
+
+```{r}
+climate_tweets <- search_tweets(q = "#Climate", 
+                        n = 1000,
+                        include_rts = FALSE,
+                        `-filter` = "replies",
+                        lang = "en")
+```
+
+
+## Identify the most liked tweets and present the first 15.
+```{r}
+climate_tweets %>%
+  arrange(-favourites_count) %>%
+  top_n(15, favourites_count) %>%
+  select(created_at, screen_name, text, favorite_count)
+
+```
+
+
+## Identify top tweeters in your dataset and present the first 5
+```{r}
+climate_tweets %>%
+  count(screen_name, sort = TRUE) %>%
+  top_n(5) %>%
+  mutate(screen_name = paste0("@, screen_name")) # paste0() function concatenates all elements within the vector
+```
+
+
+## Identify top emojis in your dataset and present the first 10.
+```{r}
+# install emo package from github 
+devtools::install_github("hadley/emo")
+library(emo)
+
+climate_tweets %>%
+  mutate(emoji = ji_extract_all(text)) %>% # create a column and use the ji_extract_all() function to extract emojis from a string 
+  unnest(cols = c(emoji)) %>% # unnest() function converts the data frame into a unnested object > creates a tibble 
+  count(emoji, sort = TRUE) %>%
+  top_n(10)
+```
+
+
+## Identify top hashtags in your dataset and present the first 10.
+```{r}
+# unnest_token > part of the tidytext() package
+# must have this package installed before running this script
+# in the unnest_token() function, add the 'hashtag' object
+
+climate_tweets %>%
+  unnest_tokens(
+    hashtag, 
+    text, "tweets", 
+    to_lower = FALSE) %>%
+  filter(str_detect(hashtag, "^#"),
+         hashtag != "Climate") %>%
+  count(hashtag, sort = TRUE) %>%
+  top_n(10)
+```
+
+
+## Identify top mentions in your dataset and present the first 10. 
+```{r}
+# unnest_token > part of the tidytext() package
+# extremely similar to the script above
+# the only difference, is we use the mention() object rather than the hastag() object
+
+climate_tweets %>%
+   unnest_tokens(mentions,
+                 text, "tweets", 
+                 to_lower = FALSE) %>%
+  filter(str_detect(mentions, "^@")) %>%  
+  count(mentions, sort = TRUE) %>%
+  top_n(10)
+```
+
+
+  
+
+## Get a list of all accounts that the top tweeter follows and present the first 5
+```{r}
+climate_tweets %>%
+  unnest_tokens(lookup_users, 
+                text, "tweets",
+                to_lower = FALSE) %>%
+  filter(str_detect(lookup_users, "^@")) %>%
+  count(lookup_users, sort = TRUE) %>%
+  top_n(5)
+```
+
+
+## Get a list of followers of the top tweeter and present the first 5 
+```{r}
+climate_tweets %>% 
+  arrange(-favorite_count) %>%
+  top_n(5, favorite_count) %>% 
+  select(screen_name, text, favorite_count) %>%
+  top_n(5)
+climate_tweets
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
