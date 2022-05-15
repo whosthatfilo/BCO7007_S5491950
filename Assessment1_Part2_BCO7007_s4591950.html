@@ -1532,27 +1532,29 @@ div.tocify {
 <h2><span class="header-section-number">1.2</span> Identify the most
 liked tweets and present the first 15.</h2>
 <pre class="r"><code>climate_tweets %&gt;%
-  arrange(-favourites_count) %&gt;%
+  arrange(-favourites_count) %&gt;% # favourite count = most liked tweets
   top_n(15, favourites_count) %&gt;%
   select(created_at, screen_name, text, favorite_count)</code></pre>
-<pre><code>## # A tibble: 15 × 4
+<pre><code>## # A tibble: 17 × 4
 ##    created_at          screen_name     text                       favorite_count
 ##    &lt;dttm&gt;              &lt;chr&gt;           &lt;chr&gt;                               &lt;int&gt;
-##  1 2022-05-13 15:14:57 Tokyo_Tom       &quot;Something wicked.\n\&quot;The…              2
-##  2 2022-05-14 01:03:46 Maintenonmadame &quot;@DanielBleakley Interest…             17
-##  3 2022-05-13 14:52:19 ericthelemming  &quot;Uproot the system! \n\n#…              3
-##  4 2022-05-13 22:18:39 HenryK_B_       &quot;@dorfman_p \&quot;Let&#39;s use S…              1
-##  5 2022-05-13 16:06:18 HenryK_B_       &quot;@SedimentIV @squashrambl…              0
-##  6 2022-05-13 16:16:06 HenryK_B_       &quot;@ENERGY \&quot;Destroying the…              0
-##  7 2022-05-14 09:11:12 coonavass       &quot;#LookUp and #VoteForClim…              4
-##  8 2022-05-14 04:55:16 CaraMia200      &quot;@JackDempseyQLD @Lyn_Col…              5
-##  9 2022-05-14 02:56:19 CaraMia200      &quot;@rajah_mich @IntestinalW…              5
-## 10 2022-05-13 11:19:34 oakroyd         &quot;#Climate - Scientists Gi…              0
-## 11 2022-05-13 18:57:00 Barkum68        &quot;Sunspot Number Spiking, …              0
-## 12 2022-05-13 20:36:07 OneStepBayond   &quot;Carbon bombs\nUS frackin…              4
-## 13 2022-05-13 13:10:30 sallyeaves      &quot;@JordOnalytica @GEOTAB @…              4
-## 14 2022-05-14 06:00:00 EarthAccounting &quot;#Climate-Driven Drought …              3
-## 15 2022-05-13 14:30:00 EarthAccounting &quot;#Aviation Industry Has M…              1</code></pre>
+##  1 2022-05-14 11:07:29 BethRenee       &quot;$11 million …in subsidie…              2
+##  2 2022-05-14 23:55:33 Maintenonmadame &quot;I am ENRAGED by the dete…              2
+##  3 2022-05-14 01:03:46 Maintenonmadame &quot;@DanielBleakley Interest…             30
+##  4 2022-05-14 21:32:58 mtnpoet         &quot;Earth Flares, Magnetic D…              0
+##  5 2022-05-15 02:49:14 FierceDinosaur  &quot;Meet Zoe Daniel: Journal…              1
+##  6 2022-05-15 06:29:40 cindian1        &quot;@CTVVancouver @jjhorgan …              0
+##  7 2022-05-14 15:09:20 kevinrns        &quot;@rahmstorf @infpwriter S…              1
+##  8 2022-05-14 14:43:23 HenryK_B_       &quot;@dorfman_p Carbon-free n…              1
+##  9 2022-05-14 09:11:12 coonavass       &quot;#LookUp and #VoteForClim…            142
+## 10 2022-05-15 02:39:23 coonavass       &quot;Thanks again to all thos…              3
+## 11 2022-05-15 01:05:58 CaraMia200      &quot;#HIGGINS Serial noddie, …             43
+## 12 2022-05-14 02:56:19 CaraMia200      &quot;@rajah_mich @IntestinalW…              5
+## 13 2022-05-14 04:55:16 CaraMia200      &quot;@JackDempseyQLD @Lyn_Col…              5
+## 14 2022-05-14 20:09:48 pmagn           &quot;@TheAgenda .@spaikin \nR…              0
+## 15 2022-05-14 16:44:56 pmagn           &quot;@AndrewDessler Yup.. mus…              8
+## 16 2022-05-14 16:46:41 pmagn           &quot;Yup.. must watch #econom…              2
+## 17 2022-05-14 16:45:32 pmagn           &quot;@AndrewDessler @RollingS…              0</code></pre>
 </div>
 <div id="identify-top-tweeters-in-your-dataset-and-present-the-first-5" class="section level2" number="1.3">
 <h2><span class="header-section-number">1.3</span> Identify top tweeters
@@ -1562,14 +1564,15 @@ in your dataset and present the first 5</h2>
   top_n(5) %&gt;%
   mutate(screen_name = paste0(&quot;@, screen_name&quot;)) # paste0() function concatenates all elements within the vector</code></pre>
 <pre><code>## Selecting by n</code></pre>
-<pre><code>## # A tibble: 5 × 2
+<pre><code>## # A tibble: 6 × 2
 ##   screen_name        n
 ##   &lt;chr&gt;          &lt;int&gt;
-## 1 @, screen_name    27
-## 2 @, screen_name    25
-## 3 @, screen_name     9
-## 4 @, screen_name     8
-## 5 @, screen_name     8</code></pre>
+## 1 @, screen_name    49
+## 2 @, screen_name    18
+## 3 @, screen_name    14
+## 4 @, screen_name    10
+## 5 @, screen_name     9
+## 6 @, screen_name     9</code></pre>
 </div>
 <div id="identify-top-emojis-in-your-dataset-and-present-the-first-10." class="section level2" number="1.4">
 <h2><span class="header-section-number">1.4</span> Identify top emojis
@@ -1589,20 +1592,21 @@ climate_tweets %&gt;%
   count(emoji, sort = TRUE) %&gt;%
   top_n(10)</code></pre>
 <pre><code>## Selecting by n</code></pre>
-<pre><code>## # A tibble: 11 × 2
-##    emoji            n
-##    &lt;chr&gt;        &lt;int&gt;
-##  1 &quot;\U0001f449&quot;    14
-##  2 &quot;\U0001f447&quot;    10
-##  3 &quot;\U0001f680&quot;     9
-##  4 &quot;\U0001f525&quot;     8
-##  5 &quot;⬇️&quot;              7
-##  6 &quot;\U0001f30d&quot;     7
-##  7 &quot;\U0001f30e&quot;     7
-##  8 &quot;\U0001f333&quot;     7
-##  9 &quot;\U0001f4e3&quot;     7
-## 10 &quot;\U0001f334&quot;     6
-## 11 &quot;\U0001f44f&quot;     6</code></pre>
+<pre><code>## # A tibble: 12 × 2
+##    emoji                      n
+##    &lt;chr&gt;                  &lt;int&gt;
+##  1 &quot;✨&quot;                      14
+##  2 &quot;\U0001f340&quot;              14
+##  3 &quot;\U0001f4bc&quot;              14
+##  4 &quot;\U0001f4cd&quot;              14
+##  5 &quot;\U0001f449&quot;              13
+##  6 &quot;\U0001f525&quot;              12
+##  7 &quot;\U0001f30e&quot;              11
+##  8 &quot;\U0001f447&quot;               7
+##  9 &quot;❤️&quot;                        6
+## 10 &quot;⚡&quot;                       6
+## 11 &quot;1️⃣&quot;                        6
+## 12 &quot;\U0001f1e8\U0001f1e6&quot;     6</code></pre>
 </div>
 <div id="identify-top-hashtags-in-your-dataset-and-present-the-first-10." class="section level2" number="1.5">
 <h2><span class="header-section-number">1.5</span> Identify top hashtags
@@ -1624,16 +1628,16 @@ climate_tweets %&gt;%
 <pre><code>## # A tibble: 10 × 2
 ##    hashtag               n
 ##    &lt;chr&gt;             &lt;int&gt;
-##  1 #climate            705
-##  2 #Climate            241
-##  3 #climatechange       69
-##  4 #ClimateCrisis       52
-##  5 #ClimateAction       45
-##  6 #nature              40
-##  7 #environment         35
-##  8 #ClimateChange       32
-##  9 #climatecrisis       29
-## 10 #ClimateEmergency    29</code></pre>
+##  1 #climate            747
+##  2 #Climate            222
+##  3 #climatechange       81
+##  4 #ClimateCrisis       71
+##  5 #ClimateAction       68
+##  6 #ClimateEmergency    54
+##  7 #environment         48
+##  8 #nature              46
+##  9 #climatecrisis       35
+## 10 #earth               33</code></pre>
 </div>
 <div id="identify-top-mentions-in-your-dataset-and-present-the-first-10." class="section level2" number="1.6">
 <h2><span class="header-section-number">1.6</span> Identify top mentions
@@ -1650,61 +1654,82 @@ climate_tweets %&gt;%
   count(mentions, sort = TRUE) %&gt;%
   top_n(10)</code></pre>
 <pre><code>## Selecting by n</code></pre>
-<pre><code>## # A tibble: 10 × 2
+<pre><code>## # A tibble: 18 × 2
 ##    mentions             n
 ##    &lt;chr&gt;            &lt;int&gt;
-##  1 @GlobalCrisis       12
-##  2 @NASA                8
-##  3 @GeraldKutney        6
-##  4 @GNGAgritech         6
-##  5 @bradydennis         4
-##  6 @Climageddon         4
-##  7 @GretaThunberg       4
-##  8 @JobOneForHuman1     4
-##  9 @JoeBiden            4
-## 10 @KlausErmecke        4</code></pre>
+##  1 @GlobalCrisis       15
+##  2 @UN                  7
+##  3 @JobOneForHuman1     6
+##  4 @JoshFrydenberg      6
+##  5 @LilacSolutions      6
+##  6 @amazon              5
+##  7 @BNBuzz              5
+##  8 @KlausErmecke        5
+##  9 @AlboMP              4
+## 10 @bcndp               4
+## 11 @Climageddon         4
+## 12 @cpsavesoil          4
+## 13 @djaberclimate       4
+## 14 @ECOWARRIORSS        4
+## 15 @GNGAgritech         4
+## 16 @InsidersABC         4
+## 17 @SadhguruJV          4
+## 18 @SECGov              4</code></pre>
 </div>
 <div id="get-a-list-of-all-accounts-that-the-top-tweeter-follows-and-present-the-first-5" class="section level2" number="1.7">
 <h2><span class="header-section-number">1.7</span> Get a list of all
 accounts that the top tweeter follows and present the first 5</h2>
 <pre class="r"><code>climate_tweets %&gt;%
-  unnest_tokens(lookup_users, 
+  unnest_tokens(lookup_users, # lookup_user() function to search for all the accounts that the top tweeter follows
                 text, &quot;tweets&quot;,
                 to_lower = FALSE) %&gt;%
   filter(str_detect(lookup_users, &quot;^@&quot;)) %&gt;%
   count(lookup_users, sort = TRUE) %&gt;%
   top_n(5)</code></pre>
 <pre><code>## Selecting by n</code></pre>
-<pre><code>## # A tibble: 10 × 2
-##    lookup_users         n
-##    &lt;chr&gt;            &lt;int&gt;
-##  1 @GlobalCrisis       12
-##  2 @NASA                8
-##  3 @GeraldKutney        6
-##  4 @GNGAgritech         6
-##  5 @bradydennis         4
-##  6 @Climageddon         4
-##  7 @GretaThunberg       4
-##  8 @JobOneForHuman1     4
-##  9 @JoeBiden            4
-## 10 @KlausErmecke        4</code></pre>
+<pre><code>## # A tibble: 5 × 2
+##   lookup_users         n
+##   &lt;chr&gt;            &lt;int&gt;
+## 1 @GlobalCrisis       15
+## 2 @UN                  7
+## 3 @JobOneForHuman1     6
+## 4 @JoshFrydenberg      6
+## 5 @LilacSolutions      6</code></pre>
 </div>
 <div id="get-a-list-of-followers-of-the-top-tweeter-and-present-the-first-5" class="section level2" number="1.8">
 <h2><span class="header-section-number">1.8</span> Get a list of
 followers of the top tweeter and present the first 5</h2>
 <pre class="r"><code>climate_tweets %&gt;%
-  count(screen_name, sort = TRUE) %&gt;%
-  top_n(5) %&gt;%
-  mutate(screen_name = paste0(&quot;@&quot;, screen_name),get_followers(&quot;climate&quot;, n = 5))</code></pre>
+  unnest_tokens(get_followers(&quot;climate&quot;),
+                text, &quot;tweets&quot;,
+                to_lower = FALSE) %&gt;%
+  count(screen_name, sort = TRUE) %&gt;% 
+  top_n(5) # filter the top twitter user (only select top 5)</code></pre>
 <pre><code>## Selecting by n</code></pre>
-<pre><code>## # A tibble: 5 × 3
-##   screen_name        n user_id            
-##   &lt;chr&gt;          &lt;int&gt; &lt;chr&gt;              
-## 1 @episson_store    27 1379896431671181317
-## 2 @Bentler          25 1520110836500811776
-## 3 @PolyConundrum     9 40934993           
-## 4 @bear_risa         8 1200936373257199616
-## 5 @IFOS9000          8 1402143260672360453</code></pre>
+<pre><code>## # A tibble: 5 × 2
+##   screen_name        n
+##   &lt;chr&gt;          &lt;int&gt;
+## 1 episson_store   1337
+## 2 sillymickel      341
+## 3 Thorium_232      331
+## 4 ClimateJobList   318
+## 5 PolyConundrum    276</code></pre>
+<pre class="r"><code>climate_tweets[1:5,]</code></pre>
+<pre><code>## # A tibble: 5 × 90
+##   user_id             status_id     created_at          screen_name text  source
+##   &lt;chr&gt;               &lt;chr&gt;         &lt;dttm&gt;              &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt; 
+## 1 1499104532286132232 152579628989… 2022-05-15 11:12:38 Tx2Ai       &quot;Ear… Twitt…
+## 2 1499104532286132232 152550758177… 2022-05-14 16:05:24 Tx2Ai       &quot;Ear… Twitt…
+## 3 1499104532286132232 152535358399… 2022-05-14 05:53:28 Tx2Ai       &quot;Ear… Twitt…
+## 4 768124943036997632  152579579035… 2022-05-15 11:10:38 SThondhlan… &quot;Do … Insta…
+## 5 1014819282226728963 152579571941… 2022-05-15 11:10:22 VoteHafner  &quot;#en… Twitt…
+## # … with 84 more variables: display_text_width &lt;dbl&gt;, reply_to_status_id &lt;chr&gt;,
+## #   reply_to_user_id &lt;chr&gt;, reply_to_screen_name &lt;chr&gt;, is_quote &lt;lgl&gt;,
+## #   is_retweet &lt;lgl&gt;, favorite_count &lt;int&gt;, retweet_count &lt;int&gt;,
+## #   quote_count &lt;int&gt;, reply_count &lt;int&gt;, hashtags &lt;list&gt;, symbols &lt;list&gt;,
+## #   urls_url &lt;list&gt;, urls_t.co &lt;list&gt;, urls_expanded_url &lt;list&gt;,
+## #   media_url &lt;list&gt;, media_t.co &lt;list&gt;, media_expanded_url &lt;list&gt;,
+## #   media_type &lt;list&gt;, ext_media_url &lt;list&gt;, ext_media_t.co &lt;list&gt;, …</code></pre>
 </div>
 </div>
 

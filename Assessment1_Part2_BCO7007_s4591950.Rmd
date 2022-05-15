@@ -123,9 +123,11 @@ climate_tweets %>%
 ## Get a list of followers of the top tweeter and present the first 5 
 ```{r}
 climate_tweets %>%
+  unnest_tokens(get_followers("climate"),
+                text, "tweets",
+                to_lower = FALSE) %>%
   count(screen_name, sort = TRUE) %>% 
-  top_n(5) %>% # filter the top twitter user (only select top 5)
-  get_followers(user_id) # use the get_followers() function
+  top_n(5) # filter the top twitter user (only select top 5)
 climate_tweets[1:5,]
 
 ```
