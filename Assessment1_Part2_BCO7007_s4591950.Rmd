@@ -5,9 +5,10 @@ date: '2022-05-14'
 output: 
   html_document:
       number_sections: true           
-      toc: true                                                                  #TOC = Table of COntents
+      toc: true                       #TOC = Table of COntents
       toc_depth: 2
-      theme: readable                                                            #Added a theme to make the document more appealing
+      toc_float: true
+      theme: cerulean                  #Added a theme to make the document more appealing
 ---
 
 ```{r setup, include=FALSE}
@@ -29,7 +30,7 @@ library(devtools)
 
 ## Data import
 
-Step 1. collect tweets about coffee
+Collecting data about the keyword "Climate"
 
 ```{r}
 climate_tweets <- search_tweets(q = "#Climate", 
@@ -43,7 +44,7 @@ climate_tweets <- search_tweets(q = "#Climate",
 ## Identify the most liked tweets and present the first 15.
 ```{r}
 climate_tweets %>%
-  arrange(-favourites_count) %>%
+  arrange(-favourites_count) %>% # favourite count = most liked tweets
   top_n(15, favourites_count) %>%
   select(created_at, screen_name, text, favorite_count)
 
@@ -107,12 +108,10 @@ climate_tweets %>%
 ```
 
 
-  
-
 ## Get a list of all accounts that the top tweeter follows and present the first 5
 ```{r}
 climate_tweets %>%
-  unnest_tokens(lookup_users, 
+  unnest_tokens(lookup_users, # lookup_user() function to search for all the accounts that the top tweeter follows
                 text, "tweets",
                 to_lower = FALSE) %>%
   filter(str_detect(lookup_users, "^@")) %>%
@@ -123,12 +122,11 @@ climate_tweets %>%
 
 ## Get a list of followers of the top tweeter and present the first 5 
 ```{r}
-climate_tweets %>% 
-  arrange(-favorite_count) %>%
-  top_n(5, favorite_count) %>% 
-  select(screen_name, text, favorite_count) %>%
-  top_n(5)
-climate_tweets
+climate_tweets %>%
+  count(screen_name, sort = TRUE) %>% 
+  top_n(5) %>% # filter the top twitter user (only select top 5)
+  get_followers(user_id) # use the get_followers() function
+climate_tweets[1:5,]
 
 ```
 
