@@ -31,8 +31,10 @@ library(magick)
 
 ```{r}
 # This opens the .Renviron file
-usethis::edit_r_environ('ap-southeast-2'):
-  
+# usethis::edit_r_environ('ap-southeast-2'):
+```
+
+```{r}
   # Set up your keys and region here:
   # Fill the information below on the .Renviron file
 Sys.setenv(
@@ -146,3 +148,23 @@ resp$FaceMatches[[1]]$Similarity
 
 ```
 
+
+```{r} 
+# Convert raw image into a magik object
+suspects <- image_read(suspects)
+
+# Extract face match from the response
+match <- resp$FaceMatches[[1]]
+
+# Calculate bounding box properties
+width <-match$Face$BoundingBox$Width * image_info(suspects)$width
+height <-match$Face$BoundingBox$Height * image_info(suspects)$height
+left <-match$Face$BoundingBox$Left * image_info(suspects)$width
+top <-match$Face$BoundingBox$Top * image_info(suspects)$height
+
+# Add bounding box to suspects image 
+image <- suspects %>%
+  image_draw()
+rect(left, top, left + width, top + height, border = "red", lty = "dashed", lwd = 5)
+image
+```

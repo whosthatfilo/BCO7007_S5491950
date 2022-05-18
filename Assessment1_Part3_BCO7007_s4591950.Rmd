@@ -1,0 +1,95 @@
+---
+title: "Assessment1_Part3"
+author: "Kris Chavez (s4591950)"
+date: '2022-05-18'
+output: 
+  html_document:
+      number_sections: true           
+      toc: true                       #TOC = Table of COntents
+      toc_depth: 2
+      toc_float: true
+      theme: cerulean                  #Added a theme to make the document more appealing
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("tidyverse")
+#install.packages("topicmodels")
+#install.packages("tidytext")
+#install.packages("ggplot2")
+#install.packages("dplyr")
+#install.packages("quanteda")
+#install.packages("wordcloud")
+#install.packages("readtext")
+
+library(tidyverse)
+library(topicmodels)
+library(tidytext)
+library(ggplot2)
+library(dplyr)
+library(quanteda)
+library(wordcloud)
+library(readtext)
+```
+
+# Part 3: Topic modeling and visualization
+## Preprocess text from your dataset to tidy text and convert it to DocumentTermMatrix
+```{r}
+library(quanteda)
+library(readtext)
+# Load the dataset
+climate_data <- read.csv("climate_tweets.csv", header = TRUE)
+head(climate_data) # Lists the top 6 results
+
+# Create a corpus
+# Summary: structuring words within the dataset 
+corpus <- Corpus(VectorSource(climate_data$text))
+
+# Text cleaning
+climate_data <- tm_map(corpus, content_transformer(tolower)) # Convert the text to lower case
+climate_data <- tm_map(corpus, removeNumbers) # Removes numbers
+climate_data <- tm_map(corpus, removeWords, stopwords("english")) # Removes English common stop words
+climate_data <- tm_map(corpus, removePunctuation) # Removes punctuation
+climate_data <- tm_map(corpus, stripWhitespace) # Eliminate extra white spaces
+
+# Create TDM 
+tdm <- TermDocumentMatrix(climate_data)
+m <- as.matrix(tdm)
+v <- sort(rowSums(m), decreasing = TRUE)
+d <- data.frame(word = names(v), frequency=v)
+```
+
+
+## Use `LDA()` function to create an LDA model. Experiment with different number of topics (`k=`)
+```{r}
+
+```
+
+
+## Visualise the top 10 words from each topic to brainstorm on possible topics that they cover.
+```{r}
+library(tm)
+library(wordcloud)
+# Create the wordcloud
+wordcloud(d$word,
+          d$frequency,
+          random.order = FALSE,
+          rot.per = 0.3,
+          scale = c(4,.5),
+          max.words = 10,
+          font.main = 1,
+          cex.main = 1.5)
+wordcloud
+```
+
+
+## Write 2-3 sentences comparing LDA models you generated with different number of topics. Explain which model you think best covers your data. 
+```{r}
+
+```
+
+
+## Come to a conclusion about the topics that your dataset presents.
+```{r}
+
+```
