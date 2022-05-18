@@ -1,0 +1,148 @@
+---
+title: "Assessment 2"
+author: "Kris Chavez (s4591950)"
+date: '2022-05-18'
+output: 
+  html_document:
+      number_sections: true           
+      toc: true                       #TOC = Table of COntents
+      toc_depth: 2
+      toc_float: true
+      theme: cerulean                  #Added a theme to make the document more appealing
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("paws")
+#install.packages("purrr")
+#install.packages("tibble")
+#install.packages("readr")
+#install.packages("magick")
+
+library(paws)
+library(purrr)
+library(tibble)
+library(readr)
+library(magick)
+```
+
+# PART 1: 
+## API installation + Image recognition for Text in Image task
+
+```{r}
+# This opens the .Renviron file
+usethis::edit_r_environ('ap-southeast-2'):
+  
+  # Set up your keys and region here:
+  # Fill the information below on the .Renviron file
+Sys.setenv(
+  "AWS_ACCESS_KEY_ID" = "AKIAXPQYVOA3M6THPGEO",
+  "AWS_SECRET_ACCESS_KEY" = "F5YlC1xLui5OeH/rAbpXcnaY4wyl6fnUfsMfxXWy",
+  "AWS_REGION" = "ap-southeast-2"
+  )
+```
+
+
+```{r}
+# Create the dataframe called s3
+s3 <- s3()
+
+# List the available buckets below
+buckets <- s3$list_buckets()
+length(buckets$Buckets)
+
+# Create the bucket called "kris-s4591950-aws-bucket"
+s3$create_bucket(Bucket = "kris-s4591950-aws-bucket",
+                 CreateBucketConfiguration = list(
+                   LocationConstraint = "ap-southeast-2"
+                 ))
+```
+
+
+```{r}
+# Specify the bucket name 
+buckets <- s3$list_buckets()
+buckets <- map_df(buckets[[1]],
+                  ~tibble(name = .$Name, creationDate = .$CreationDate))
+buckets
+```
+
+
+```{r}
+# Store the name of our newly created bucket in a separate variable
+my_bucket <- buckets$name[buckets$name == "kris-s4591950-aws-bucket"]
+
+# Text in image detection 
+# Download this image from: https://maria-pro.github.io/bco7007/data/aws_text.jpeg
+# Referencing an image: upload the image to the s3 bucket we just created
+s3$put_object(Bucket = my_bucket, 
+              Body = read_file_raw("aws_text.jpg"), 
+              Key = "aws_text.jpg")
+```
+
+
+```{r}
+# Check if the image resides in your bucket
+bucket_objects <- s3$list_objects(my_bucket) %>% 
+  .[["Contents"]] %>% 
+  map_chr("Key") 
+bucket_objects
+```
+
+
+```{r}
+# Create a rekognition client 
+rekognition <- rekognition()
+
+# Referencing an image in an Amazon S3 bucket
+resp <- rekognition$detect_text(
+  Image = list(
+    S3Object = list(
+      Bucket = my_bucket,
+      Name = bucket_objects
+    )
+  )
+)
+
+# Parsing the response
+resp %>%
+  .[["TextDetections"]] %>%
+  keep(~.[["Type"]] == "WORD") %>%
+  map_chr("DetectedText") 
+```
+
+
+# Part 2
+## Image recognition for compare faces task
+
+```{r}
+# Send the 2 images directly to the API endpoint using the script below
+thief <- readr::read_file_raw("thief.jpg") 
+suspects <- readr::read_file_raw("usual_suspects.png")
+
+```
+
+
+```{r}
+# Compare the faces endpoint
+resp <- rekognition$compare_faces(
+  SourceImage = list(
+    Bytes = thief
+  ),
+  TargetImage = list(
+    Bytes = suspects
+  )
+)
+
+# identify the length of the UnmatchedFaces
+length(resp$UnmatchedFaces)
+
+# identify the length of the FaceMatches
+length(resp$FaceMatches)
+
+# Compare the 2 faces (Unmatched vs. FaceMatch)
+# Displays the accuracy of the predicted result against the similarity
+resp$FaceMatches[[1]]$Similarity
+
+```
+
