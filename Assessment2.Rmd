@@ -31,17 +31,18 @@ library(magick)
 
 ```{r}
 # This opens the .Renviron file
-# usethis::edit_r_environ('ap-southeast-2'):
+# store the secret keys in this file
+usethis::edit_r_environ():
 ```
 
 ```{r}
   # Set up your keys and region here:
   # Fill the information below on the .Renviron file
-Sys.setenv(
-  "AWS_ACCESS_KEY_ID" = "AKIAXPQYVOA3LUITONFX",
-  "AWS_SECRET_ACCESS_KEY" = "ZGv5UvrtaPT1El4YjYkLrT+wh5zrK41LxcidO4vD",
-  "AWS_REGION" = "ap-southeast-2"
-  )
+#Sys.setenv(
+# "AWS_ACCESS_KEY_ID" = "AKIAXPQYVOA3LUITONFX",
+# "AWS_SECRET_ACCESS_KEY" = "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",
+# "AWS_REGION" = "ap-southeast-2"
+#  )
 ```
 
 
