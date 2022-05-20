@@ -38,8 +38,8 @@ library(magick)
   # Set up your keys and region here:
   # Fill the information below on the .Renviron file
 Sys.setenv(
-  "AWS_ACCESS_KEY_ID" = "AKIAXPQYVOA3M6THPGEO",
-  "AWS_SECRET_ACCESS_KEY" = "F5YlC1xLui5OeH/rAbpXcnaY4wyl6fnUfsMfxXWy",
+  "AWS_ACCESS_KEY_ID" = "AKIAXPQYVOA3LUITONFX",
+  "AWS_SECRET_ACCESS_KEY" = "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",
   "AWS_REGION" = "ap-southeast-2"
   )
 ```
@@ -53,8 +53,8 @@ s3 <- s3()
 buckets <- s3$list_buckets()
 length(buckets$Buckets)
 
-# Create the bucket called "kris-s4591950-aws-bucket"
-s3$create_bucket(Bucket = "kris-s4591950-aws-bucket",
+# Create the bucket called "kris-s4591950-bucket2"
+s3$create_bucket(Bucket = "kris-s4591950-bucket2",
                  CreateBucketConfiguration = list(
                    LocationConstraint = "ap-southeast-2"
                  ))
@@ -72,14 +72,14 @@ buckets
 
 ```{r}
 # Store the name of our newly created bucket in a separate variable
-my_bucket <- buckets$name[buckets$name == "kris-s4591950-aws-bucket"]
+my_bucket <- buckets$name[buckets$name == "kris-s4591950-bucket2"]
 
 # Text in image detection 
-# Download this image from: https://maria-pro.github.io/bco7007/data/aws_text.jpeg
+# Download this image from: https://literacyideas.com/different-text-types/
 # Referencing an image: upload the image to the s3 bucket we just created
 s3$put_object(Bucket = my_bucket, 
-              Body = read_file_raw("aws_text.jpg"), 
-              Key = "aws_text.jpg")
+              Body = read_file_raw("text_data.jpg"), 
+              Key = "text_data.jpg")
 ```
 
 
@@ -119,8 +119,8 @@ resp %>%
 
 ```{r}
 # Send the 2 images directly to the API endpoint using the script below
-thief <- readr::read_file_raw("thief.jpg") 
-suspects <- readr::read_file_raw("usual_suspects.png")
+thief <- readr::read_file_raw("face_detect1.jpg") 
+suspects <- readr::read_file_raw("face_detect2.png")
 
 ```
 
