@@ -41,60 +41,57 @@ library(tidyr)
 # Part 3: Topic modeling and visualization
 
 ## Preprocess text from your dataset to tidy text and convert it to DocumentTermMatrix
-```{r}
+```{r cleaning the dataset, include = FALSE}
 # Load the dataset
 climate_data <- read.csv("climate_tweets.csv", header = TRUE)
 head(climate_data) # Lists the top 6 results
+```
+
+```{r}
+# Text cleaning
+# climate_data <- tm_map(climate_corpus, content_transformer(tolower)) # Convert the text to lower case
+climate_data$text <- removeNumbers(climate_data$text) # Removes numbers
+climate_data$text <- removeWords(climate_data$text, stopwords("english")) # Removes English common stop words
+climate_data$text <- removePunctuation(climate_data$text) # Removes punctuation
+climate_data$text <- stripWhitespace(climate_data$text) # Eliminate extra white spaces
+
+# Replace and remove punctuation and unwanted symbols
+climate_data$text <- str_replace_all(climate_data$text,"@\\w+", "" )
+climate_data$text <- str_replace_all(climate_data$text,"https://.*\\w+", "")
+climate_data$text <- str_remove_all(climate_data$text,"[[:punct:]]")
+
+# Unnest token 
+# Separating the each word from TEXT column
+data_unnest <- climate_data %>%
+  select(text) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(get_stopwords())
+
 
 # Create a corpus
 # Summary: structuring words within the data set 
-climate_corpus <- Corpus(VectorSource(climate))
+climate_corpus <- VCorpus(VectorSource(data_unnest))
 
-# Text cleaning
-climate_data <- tm_map(climate_corpus, content_transformer(tolower)) # Convert the text to lower case
-climate_data <- tm_map(climate_corpus, removeNumbers) # Removes numbers
-climate_data <- tm_map(climate_corpus, removeWords, stopwords("english")) # Removes English common stop words
-climate_data <- tm_map(climate_corpus, removePunctuation) # Removes punctuation
-climate_data <- tm_map(climate_corpus, stripWhitespace) # Eliminate extra white spaces
 
-# Create DocumentTermMatrix 
-climate_tdm <- DocumentTermMatrix(climate_data)
-m <- as.matrix(tdm)
-v <- sort(rowSums(m), decreasing = TRUE)
-d <- data.frame(word = names(v), frequency=v)
-climate_tdm
-
-# to reduce the sparsity 
-removeSparseTerms(climate_tdm, sparse = 0.85)
+# Create a document term matrix
+climate_dtm <- DocumentTermMatrix(climate_corpus, 
+                                  control = list(minWordLength=c(1,Inf)))
 ```
 
 
 ## Use `LDA()` function to create an LDA model. Experiment with different number of topics (`k=`)
 ```{r}
-# Build corpus
-climate_corpus <- Corpus(VectorSource(climate))
-
-# Clean the data set
-climate_corpus$text <- str_replace_all(climate_corpus$text,"@\\w+", "" )
-climate_corpus$text <- str_replace_all(climate_corpus$text,"https://.*\\w+", "")
-
-# Create a document term matrix
-climate_tdm <- DocumentTermMatrix(climate_corpus, 
-                                  control = list(minWordLength=c(1,Inf)))
-
 # set parameters for Gibbs sampling 
 # Gibbs is another sampling tool that draws the instance from the distribution of each variable
 burning <- 4000
 iter <- 2000
 thin <- 500
-seed <- list(2003,5,63,100001,756)
-nstart <- 5
+seed <- list(1000)
+nstart <- 1
 best <- TRUE
 
-# Number of topics
-k <- 2
-
-ldaOut <- LDA(climate_tdm, k, method = "Gibbs", control = list(
+# Set the topic number and parameters
+ldaOut <- LDA(climate_dtm, k = 2, method = "Gibbs", control = list(
   nstart = nstart, 
   seed = seed,
   iter = iter, 
@@ -102,14 +99,13 @@ ldaOut <- LDA(climate_tdm, k, method = "Gibbs", control = list(
   best = best
 ))
 
-# set the datadframe 
-ldaOut.topics <- as.matrix(topics(ldaOut))
 
 # use the tidy() to transform ldaOut into a matrix
-climate_topics <- tidy(ldaOut, matrix = "beta") 
+climate_topics_beta <- tidy(ldaOut, matrix = "beta") 
+
 
 # visualize the dataset
-climate_top_terms <- climate_topics %>%
+climate_top_terms <- climate_topics_beta %>%
   group_by(topic) %>%
   top_n(10, beta) %>%
   ungroup() %>%
@@ -122,7 +118,7 @@ climate_top_terms %>%
   facet_wrap(~ topic, scales = "free") +
   coord_flip()
 
-climate_beta_spread <- climate_topics %>%
+climate_beta_spread <- climate_topics_beta %>%
   mutate(topic = paste0("topic", topic)) %>%
   spread(topic, beta) %>%
   filter(topic1 > .001 | topic2 > .001) %>%
@@ -131,13 +127,108 @@ climate_beta_spread <- climate_topics %>%
 ```
 
 
+```{r}
+# set parameters for Gibbs sampling 
+# Gibbs is another sampling tool that draws the instance from the distribution of each variable
+burning <- 4000
+iter <- 2000
+thin <- 500
+seed <- list(1000)
+nstart <- 1
+best <- TRUE
+
+ldaOut <- LDA(climate_dtm, k = 3, method = "Gibbs", control = list(
+  nstart = nstart, 
+  seed = seed,
+  iter = iter, 
+  thin = thin, 
+  best = best
+))
+
+
+# use the tidy() to transform ldaOut into a matrix
+climate_topics_beta <- tidy(ldaOut, matrix = "beta") 
+
+# gamma = document and topics
+# beta = term and topics
+
+
+# visualize the dataset
+climate_top_terms <- climate_topics_beta %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  ungroup() %>%
+  arrange(topic, -beta)
+
+climate_top_terms %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip()
+
+climate_beta_spread <- climate_topics_beta %>%
+  mutate(topic = paste0("topic", topic)) %>%
+  spread(topic, beta) %>%
+  filter(topic1 > .001 | topic2 > .001) %>%
+  mutate(log_ratio = log2(topic2 / topic1))
+
+```
+```{r}
+# set parameters for Gibbs sampling 
+# Gibbs is another sampling tool that draws the instance from the distribution of each variable
+burning <- 4000
+iter <- 2000
+thin <- 500
+seed <- list(1000)
+nstart <- 1
+best <- TRUE
+
+ldaOut <- LDA(climate_dtm, k = 4, method = "Gibbs", control = list(
+  nstart = nstart, 
+  seed = seed,
+  iter = iter, 
+  thin = thin, 
+  best = best
+))
+
+
+# use the tidy() to transform ldaOut into a matrix
+climate_topics_beta <- tidy(ldaOut, matrix = "beta") 
+
+# gamma = document and topics
+# beta = term and topics
+
+
+# visualize the dataset
+climate_top_terms <- climate_topics_beta %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  ungroup() %>%
+  arrange(topic, -beta)
+
+climate_top_terms %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip()
+
+climate_beta_spread <- climate_topics_beta %>%
+  mutate(topic = paste0("topic", topic)) %>%
+  spread(topic, beta) %>%
+  filter(topic1 > .001 | topic2 > .001) %>%
+  mutate(log_ratio = log2(topic2 / topic1))
+
+```
+
+
 ## Visualise the top 10 words from each topic to brainstorm on possible topics that they cover.
 ```{r}
 library(tm)
 library(wordcloud)
-# Create the wordcloud
-wordcloud(d$word,
-          d$frequency,
+# Create the word cloud
+wordcloud(climate_data$text,
           random.order = FALSE,
           rot.per = 0.3,
           scale = c(4,.5),
@@ -149,8 +240,8 @@ wordcloud
 
 
 ## Write 2-3 sentences comparing LDA models you generated with different number of topics. Explain which model you think best covers your data. 
-As shown from the above plot, by changing the number of k() also known as __'topics'__, this adds new plots to the visualization.  For example, by choosing the topic "k=4" we are expecting to view 4 plots when running the script.  Regarding the model that best fits my particular data set; any topic less than 'k=4' should suffice.  This is due to the sheer amount of keywords within the visualization - adding more topics will make the plots redundant.
+As shown from the above plot, by changing the number of k() also known as __'topics'__, this adds new plots to the visualization.  For example, by choosing the topic "k=4" we are expecting to view 4 plots when running the script.  Regarding the model that best fits my particular data set; k = 3 is what makes more sense regarding the keywords.  I found that the more topics you have, the more vague the keywords become; making the model appear as confusing.
 
 
 ## Come to a conclusion about the topics that your dataset presents.
-I have come to the conclusion that __Climate, Twitter and Photo__ were the top trending topic words when filtering tweets based on the keyword "#climate".   
+I have come to the conclusion that the more topics you have in your data set, the less sense the model becomes.  In most cases, "less is more".  For my specific LDA model, I found that having 3 topic numbers makes more sense when compared to a model that has 10 topics.     
