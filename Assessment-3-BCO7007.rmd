@@ -1,0 +1,280 @@
+---
+title: "Untitled"
+author: "Joty Sekhon s4549414"
+date: '2022-06-03'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(rtweet)
+library (knitr)
+library(tidyverse)
+library(topicmodels)
+library(tidytext)
+library(ggplot2)
+library(dplyr)
+library(tm)
+library(wordcloud)
+library(quanteda)
+library(readtext)
+library(tidyr)
+library(reshape2)
+library(wordcloud)
+```
+
+## Data import collect tweets about PS5 
+```{r}
+PS5_tweets_search<-search_tweets(
+  q="PS5",
+  n=35,
+  include_rts = FALSE,
+  lang="en",
+  retryonratelimit = TRUE
+)
+
+
+PS5_tweets <- PS5_tweets_search
+```
+
+
+```{r}
+#look at first 10 obs
+PS5_tweets %>% 
+  head(10)
+  
+
+#look at structure
+PS5_tweets%>%
+  str()
+
+  
+PS5_simple<-PS5_tweets%>%
+  select(user_id, screen_name, created_at, text, favourites_count, retweet_count)
+
+PS5_simple%>%write_csv("PS5_2022.csv")
+PS5_tweets<-read_csv("PS5_2022.csv")
+```
+
+# Explore frequency of the tweets
+```{r}
+ts_plot(PS5_tweets, "hours") +
+  labs(x = NULL, y = NULL,
+       title = "Frequency of tweets with PS5",
+       subtitle = paste0(format(min(PS5_tweets$created_at), "%d %B %Y"), " to ", format(max(PS5_tweets$created_at),"%d %B %Y")),
+       caption = "PS5 tweets Data collected from Twitter") +
+  theme_minimal()
+```
+
+### Most retweeted tweet
+
+#`retweet_count` variable shows retweeting. We sort all the tweets in descending order by the size of the “retweet_count” and show top 20 results.
+```{r}
+PS5_tweets %>% 
+  arrange(-retweet_count) %>%
+  top_n(20, retweet_count) %>% 
+  select(created_at, screen_name, text, retweet_count)
+```
+
+# Identify the most liked tweets and present the first 10.
+```{r}
+PS5_tweets %>% 
+  arrange(-favourites_count) %>%
+  top_n(10, favourites_count) %>% 
+  select(created_at, screen_name, text, favourites_count)
+```
+
+# Identify top tweeters in your dataset and present the first 5
+```{r}
+PS5_tweets %>% 
+  count(screen_name, sort = TRUE) %>%
+  top_n(5) %>%
+  mutate(screen_name = paste0("@", screen_name)) %>%
+  kable()
+```
+
+# # Identify top emojis in your dataset and present the first 10
+```{r}
+install.packages("devtools")
+library(devtools)
+devtools::install_github("hadley/emo")
+library(emo)
+PS5_tweets %>%
+  mutate(emoji = ji_extract_all(text)) %>%
+  unnest(cols = c(emoji)) %>%
+  count(emoji, sort = TRUE) %>%
+  top_n(10) %>%
+  kable()
+```
+
+# Identify top hashtags in your dataset and present the first 10
+```{r}
+library(tidytext)
+PS5_tweets %>% 
+  unnest_tokens(hashtag, text, "tweets", to_lower = FALSE) %>%
+  filter(str_detect(hashtag, "^#"),
+        hashtag != "#ClimateEmergency") %>%
+  count(hashtag, sort = TRUE) %>%
+  top_n(10) %>%
+  kable()
+
+# To get the top 10 hashtags we must convert the text into 1 word per row using the unnest_tokens() to format
+# Than select the top 10 hashtags after the have been counted and view them in descending order
+```
+
+# Identify top mentions in your dataset and present the first 10
+```{r}
+PS5_tweets %>% 
+  unnest_tokens(mentions, text, "tweets", to_lower = FALSE) %>%
+  filter(str_detect(mentions, "^@")) %>%  
+  count(mentions, sort = TRUE) %>%
+  top_n(10) %>%
+  kable()
+
+#Here what we will do is tokenise the text of every tweet and than use the function `str_detect()` from the package `tidyverse` to filter out words that start with an @ .
+```
+
+# Get a list of all accounts that the top tweeter follows and present the first 5
+``` {r}
+get_friends(
+  "PS5only",
+  n = 5) %>%
+  kable()
+```
+
+# Get a list of followers of the top tweeter and present the first 5 
+``` {r}
+get_followers(
+  "PS5only",
+  n = 5) %>%
+  kable()
+```
+
+# Get location of top tweeting locations  ## Code is correct but not running
+```{r}
+library(tidyverse)
+library(rtweet)
+PS5_tweets %>%
+  filter(!is.na(place_full_name)) %>%
+  count(place_full_name, sort = TRUE) %>%
+  top_n(10)
+```
+
+
+``` {r}
+# Isolate text from tesla dataset
+PS5_text <- PS5_tweets$text
+
+# Interpret our vector as a document (Source object)
+PS5_source <- VectorSource(PS5_text)
+
+# Create the corpus
+PS5_corpus <- VCorpus(PS5_source)
+
+# Clean and structure the unstructured document
+PS5_corpus <- tm_map(PS5_corpus, content_transformer(tolower))
+PS5_corpus <- tm_map(PS5_corpus, removeNumbers)
+PS5_corpus <- tm_map(PS5_corpus, removeWords, stopwords("english"))
+PS5_corpus <- tm_map(PS5_corpus, removePunctuation)
+PS5_corpus <- tm_map(PS5_corpus, stripWhitespace)
+
+# Create DocumentTermMatrix
+DTM <- DocumentTermMatrix(PS5_corpus)
+
+# Delete all raws which are all 0:
+raw.sum=apply(DTM,1,FUN=sum) #sum by raw each raw of the table
+
+DTM=DTM[raw.sum!=0,]
+```
+
+``` {r}
+# Create LDA model
+PS5_lda <- LDA(DTM, k = 6, control = list (seed = 1234))
+
+PS5plus_lda <- LDA(DTM, k = 7, control = list (seed = 1234))
+
+# Show the probability of words W associated with T topics
+PS5_topics <- tidy(PS5_lda, matrix = "beta")
+
+PS5plus_topics <- tidy(PS5plus_lda, matrix = "beta")
+
+# Grouping the words by topics
+PS5_top_terms <- PS5_topics %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 10) %>%
+  ungroup() %>%
+  arrange(topic, -beta)
+
+PS5plus_top_terms <- PS5plus_topics %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 10) %>%
+  ungroup() %>%
+  arrange(topic, -beta)
+```
+
+``` {r}
+# Display graph of words associated with topics
+PS5_top_terms %>%
+  mutate(term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_y_reordered()
+
+PS5plus_top_terms %>%
+  mutate(term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_y_reordered()
+
+
+PS5_wide <- PS5_topics %>%
+  mutate(topic = paste0("topic", topic)) %>%
+  pivot_wider(names_from = topic, values_from = beta) %>%
+  filter(topic1 > .001 | topic2 > .001) %>%
+  mutate(log_ratio = log2(topic2 / topic1))
+
+PS5plus_wide <- PS5plus_topics %>%
+  mutate(topic = paste0("topic", topic)) %>%
+  pivot_wider(names_from = topic, values_from = beta) %>%
+  filter(topic1 > .001 | topic2 > .001) %>%
+  mutate(log_ratio = log2(topic2 / topic1))
+```
+
+``` {r}
+# Visualise the top 50 words from each topic to brainstorm on possible topics that they cover.
+wordcloud(PS5_corpus,
+          random.order = FALSE,
+          rot.per = 0.5,
+          scale = c(4,.5),
+          max.words = 50,
+          font.main = 1,
+          cex.main = 1.4)
+wordcloud
+```
+
+```{r}
+library(syuzhet)
+
+#Load the data
+PS5_sentiment <- PS5_tweets$text
+
+# Analyse sentiments using the syuzhet package
+emotions <- get_nrc_sentiment(PS5_tweets$text)
+emo_bar <- colSums(emotions)
+emo_sum <- data.frame(count=emo_bar, emotion= names(emo_bar))
+
+# Create a barplot showing the counts for each of the different emotions
+ggplot(emo_sum, aes(x = reorder(emotion,-count), y = count)) +
+  geom_bar(stat = 'identity')
+```
+
+```{r}
+
+
+
