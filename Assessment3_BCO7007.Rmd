@@ -1,0 +1,13 @@
+---
+title: "Assessment3_BCO7007"
+author: "Kris Chavez (s4591950)"
+date: '2022-06-06'
+output: 
+  html_document:
+      number_sections: true           
+      toc: true                       #TOC = Table of COntents
+      toc_depth: 2
+      toc_float: true
+      theme: cerulean                  #Added a theme to make the document more appealing
+---
+
