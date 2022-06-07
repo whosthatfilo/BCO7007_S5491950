@@ -1,15 +1,19 @@
 ---
-title: "Untitled"
-author: "Joty Sekhon s4549414"
-date: '2022-06-03'
-output: html_document
+title: "Assessment_3"
+author: "Group_3 (Joty and Kris)"
+date: '2022-06-07'
+output: 
+  html_document:
+      number_sections: true           
+      toc: true                       #TOC = Table of COntents
+      toc_depth: 2
+      toc_float: true
+      theme: cerulean                  #Added a theme to make the document more appealing
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r}
 library(tidyverse)
 library(rtweet)
 library (knitr)
@@ -29,16 +33,15 @@ library(wordcloud)
 
 ## Data import collect tweets about PS5 
 ```{r}
-PS5_tweets_search<-search_tweets(
+PS5_tweets<-search_tweets(
   q="PS5",
   n=35,
   include_rts = FALSE,
+  `-filter` = "replies",
   lang="en",
   retryonratelimit = TRUE
 )
 
-
-PS5_tweets <- PS5_tweets_search
 ```
 
 
@@ -193,7 +196,7 @@ DTM=DTM[raw.sum!=0,]
 
 ``` {r}
 # Create LDA model
-PS5_lda <- LDA(DTM, k = 6, control = list (seed = 1234))
+PS5_lda <- LDA(DTM, k = 3, control = list (seed = 1234))
 
 PS5plus_lda <- LDA(DTM, k = 7, control = list (seed = 1234))
 
@@ -272,6 +275,7 @@ emo_sum <- data.frame(count=emo_bar, emotion= names(emo_bar))
 # Create a barplot showing the counts for each of the different emotions
 ggplot(emo_sum, aes(x = reorder(emotion,-count), y = count)) +
   geom_bar(stat = 'identity')
+
 ```
 
 ```{r}
